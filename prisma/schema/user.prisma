@@ -14,18 +14,19 @@ model User {
   @@map("users")
 }
 
-model Admin {
+model Patient {
   id            String   @id @default(uuid())
-  name          String
   email         String   @unique
+  name          String
+  contactNumber String?
   profilePhoto  String?
-  contactNumber String
+  address       String?
   isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [email], references: [email])
 
-  @@map("admins")
+  @@map("patients")
 }
 
 model Doctor {
@@ -50,17 +51,16 @@ model Doctor {
   @@map("doctors")
 }
 
-model Patient {
+model Admin {
   id            String   @id @default(uuid())
-  email         String   @unique
   name          String
-  contactNumber String?
+  email         String   @unique
   profilePhoto  String?
-  address       String
+  contactNumber String
   isDeleted     Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   user          User     @relation(fields: [email], references: [email])
 
-  @@map("patients")
+  @@map("admins")
 }
