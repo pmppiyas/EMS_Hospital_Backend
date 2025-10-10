@@ -1,18 +1,28 @@
 import bcrypt from "bcryptjs";
+import { Request } from "express";
 import { StatusCodes } from "http-status-codes";
+import { ENV } from "../../config/env";
 import prisma from "../../config/prisma";
+import { fileUploader } from "../../helper/fileUploader";
 import { AppError } from "../../utils/appError";
 import { createPatientInput } from "./user.interface";
 
-const create_patient = async (payload: createPatientInput) => {
-  const salt = process.env.SALTNUMBER;
-  const hashPassword = await bcrypt.hash(
-    payload.password as string,
-    Number(salt)
-  );
+const create_patient = async (req: Request) => {
+  const salt = ENV.BCRYPT.SALTNUMBER;
+  const {
+    body,
+    file,
+  }: { body: createPatientInput; file?: Express.Multer.File } = req;
+
+  if (file) {
+    const uploadResult = await fileUploader.uploadCloudinary(file);
+    body.profilePhoto = uploadResult.url;
+  }
+
+  const hashPassword = await bcrypt.hash(body.password as string, Number(salt));
   const isExist = await prisma.user.findUnique({
     where: {
-      email: payload.email as string,
+      email: body.email as string,
     },
   });
 
@@ -23,15 +33,18 @@ const create_patient = async (payload: createPatientInput) => {
   const result = await prisma.$transaction(async (tnx) => {
     await tnx.user.create({
       data: {
-        email: payload.email as string,
+        email: body.email as string,
         password: hashPassword as string,
       },
     });
 
     return await tnx.patient.create({
       data: {
-        name: payload.name as string,
-        email: payload.email as string,
+        name: body.name as string,
+        email: body.email as string,
+        contactNumber: body.contactNumber! as string,
+        profilePhoto: body.profilePhoto! as string,
+        address: body.address! as string,
       },
     });
   });
