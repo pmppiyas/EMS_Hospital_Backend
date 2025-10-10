@@ -2,15 +2,17 @@
   "name": "hospital_ems",
   "version": "1.0.0",
   "main": "index.js",
-  "authore": "pmppiyas",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
+  "prisma": {
+    "schema": "./prisma/schema"
+  },
+  "author": "pmppiyas",
   "keywords": [],
-  "author": "Next Level Web Development",
   "license": "ISC",
   "type": "commonjs",
   "description": "",
@@ -23,6 +25,7 @@
     "ts-node-dev": "^2.0.0"
   },
   "devDependencies": {
+    "@prisma/internals": "^6.17.0",
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
