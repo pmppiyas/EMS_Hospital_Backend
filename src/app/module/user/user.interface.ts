@@ -6,3 +6,9 @@ export type createPatientInput = {
   profilePhoto?: String;
   address?: String;
 };
+
+export enum Role {
+  PATIENT,
+  DOCTOR,
+  ADMIN,
+}
