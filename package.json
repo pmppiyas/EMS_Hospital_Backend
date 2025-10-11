@@ -24,6 +24,7 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "http": "^0.0.1-security",
+    "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "ts-node-dev": "^2.0.0",
     "zod": "^4.1.12"
@@ -33,6 +34,7 @@
     "@types/compression": "^1.8.1",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/multer": "^2.0.0",
     "@types/node": "^24.2.0",
     "dotenv": "^17.2.2",
