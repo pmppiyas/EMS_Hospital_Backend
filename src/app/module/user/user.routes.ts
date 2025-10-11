@@ -4,6 +4,7 @@ import { validateRequest } from "../../middleware/validateRequest";
 import { UserController } from "./user.controller";
 import {
   createAdminValidation,
+  createDoctorValidation,
   createPatientValidation,
 } from "./user.validation";
 
@@ -21,6 +22,13 @@ router.post(
   fileUploader.upload.single("file"),
   validateRequest(createAdminValidation),
   UserController.createAdmin
+);
+
+router.post(
+  "/create_doctor",
+  fileUploader.upload.single("file"),
+  validateRequest(createDoctorValidation),
+  UserController.createDoctor
 );
 
 export const userRoutes = router;

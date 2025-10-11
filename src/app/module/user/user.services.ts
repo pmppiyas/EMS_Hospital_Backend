@@ -5,7 +5,12 @@ import { ENV } from "../../config/env";
 import prisma from "../../config/prisma";
 import { fileUploader } from "../../helper/fileUploader";
 import { AppError } from "../../utils/appError";
-import { createPatientInput, Role } from "./user.interface";
+import {
+  createAdminInput,
+  createDoctorInput,
+  createPatientInput,
+  Role,
+} from "./user.interface";
 
 const create_patient = async (req: Request) => {
   const salt = ENV.BCRYPT.SALTNUMBER;
@@ -53,14 +58,23 @@ const create_patient = async (req: Request) => {
 };
 
 const createAdmin = async (req: Request) => {
-  const {
-    body,
-    file,
-  }: { body: createPatientInput; file?: Express.Multer.File } = req;
+  const { body, file }: { body: createAdminInput; file?: Express.Multer.File } =
+    req;
   const salt = ENV.BCRYPT.SALTNUMBER;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      email: body.admin.email as string,
+    },
+  });
+
+  if (isExist) {
+    throw new AppError(StatusCodes.CONFLICT, "Patient data already exist");
+  }
+
   if (file) {
     const uploadResult = await fileUploader.uploadCloudinary(file);
-    body.profilePhoto = uploadResult.url;
+    body.admin.profilePhoto = uploadResult.url;
   }
 
   const hashPassword = await bcrypt.hash(body.password as string, Number(salt));
@@ -70,7 +84,7 @@ const createAdmin = async (req: Request) => {
       data: {
         email: req.body.admin.email,
         password: hashPassword,
-        role: "ADMIN",
+        role: Role.ADMIN,
       },
     });
     const createAdmin = await tnx.admin.create({
@@ -81,7 +95,52 @@ const createAdmin = async (req: Request) => {
   return result;
 };
 
+const createDoctor = async (req: Request) => {
+  const {
+    body,
+    file,
+  }: { body: createDoctorInput; file?: Express.Multer.File } = req;
+
+  const salt = ENV.BCRYPT.SALTNUMBER;
+
+  const isExist = await prisma.user.findUnique({
+    where: {
+      email: body.doctor.email,
+    },
+  });
+
+  if (isExist) {
+    throw new AppError(StatusCodes.CONFLICT, "Doctor already exists");
+  }
+
+  if (file) {
+    const uploadResult = await fileUploader.uploadCloudinary(file);
+    body.doctor.profilePhoto = uploadResult.url;
+  }
+
+  const hashPassword = await bcrypt.hash(body.password, Number(salt));
+
+  const result = await prisma.$transaction(async (tnx) => {
+    await tnx.user.create({
+      data: {
+        email: body.doctor.email,
+        password: hashPassword,
+        role: Role.DOCTOR,
+      },
+    });
+
+    const createdDoctor = await tnx.doctor.create({
+      data: req.body.doctor,
+    });
+
+    return createdDoctor;
+  });
+
+  return result;
+};
+
 export const UserServices = {
   create_patient,
   createAdmin,
+  createDoctor,
 };
