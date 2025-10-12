@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { fileUploader } from "../../helper/fileUploader";
+import { checkAuth } from "../../middleware/checkAuth";
 import { validateRequest } from "../../middleware/validateRequest";
 import { UserController } from "./user.controller";
+import { Role } from "./user.interface";
 import {
   createAdminValidation,
   createDoctorValidation,
@@ -10,7 +12,7 @@ import {
 
 const router = Router();
 
-router.get("/", UserController.getAllUser);
+router.get("/", checkAuth(Role.ADMIN), UserController.getAllUser);
 
 router.post(
   "/create_patient",

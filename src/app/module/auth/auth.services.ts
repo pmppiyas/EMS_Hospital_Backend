@@ -1,18 +1,12 @@
 import * as bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
-import jwt from "jsonwebtoken";
-import { ENV } from "../../config/env";
 import prisma from "../../config/prisma";
 import { jwtTokenGen } from "../../helper/jwtTokenGen";
 import { AppError } from "../../utils/appError";
-
-interface ILoginPayload {
-  email: string;
-  password: string;
-}
+import { ILoginPayload } from "./auth.interface";
 
 const crdLogin = async (payload: ILoginPayload) => {
-  const user = await prisma.user.findUniqueOrThrow({
+  const user = await prisma.user.findFirst({
     where: {
       email: payload.email,
       status: "ACTIVE",
@@ -32,9 +26,7 @@ const crdLogin = async (payload: ILoginPayload) => {
   }
 
   const { accessToken, refreshToken } = await jwtTokenGen(user);
-
-  
-
+  console.log(accessToken, refreshToken);
   return {
     accessToken,
     refreshToken,
