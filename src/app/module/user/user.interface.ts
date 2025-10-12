@@ -35,13 +35,44 @@ export type createDoctorInput = {
   };
 };
 
+export interface IUserParams {
+  limit: number;
+  skip: number;
+  searchTerm: string;
+  sortBy: string;
+  sortOrder: string;
+  role: string;
+  status: string;
+}
+
 export enum Role {
   PATIENT = "PATIENT",
   DOCTOR = "DOCTOR",
   ADMIN = "ADMIN",
 }
 
+export enum UserStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  DELETED = "DELETED",
+}
+
 export enum Gender {
   MALE = "MALE",
   FEMALE = "FEMALE",
+}
+
+export interface IOptions {
+  page?: string | number;
+  limit?: string | number;
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+export interface IOptionsResult {
+  page: number;
+  limit: number;
+  skip: number;
+  sortBy: string;
+  sortOrder: string;
 }
