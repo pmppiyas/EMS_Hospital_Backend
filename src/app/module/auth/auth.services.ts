@@ -26,7 +26,7 @@ const crdLogin = async (payload: ILoginPayload) => {
   }
 
   const { accessToken, refreshToken } = await jwtTokenGen(user);
-  console.log(accessToken, refreshToken);
+
   return {
     accessToken,
     refreshToken,

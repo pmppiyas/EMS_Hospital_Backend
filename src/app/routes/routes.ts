@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { authRoutes } from "../module/auth/auth.routes";
+import { scheduleRoutes } from "../module/schedule/schedule.routes";
 import { userRoutes } from "../module/user/user.routes";
 
 const router = Router();
@@ -17,6 +18,10 @@ const allRoutes: routerArgs[] = [
   {
     path: "/auth",
     route: authRoutes,
+  },
+  {
+    path: "/schedule",
+    route: scheduleRoutes,
   },
 ];
 
