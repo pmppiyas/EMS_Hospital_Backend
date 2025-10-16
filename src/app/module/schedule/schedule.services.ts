@@ -1,12 +1,12 @@
 import { Prisma } from "@prisma/client";
 import { addHours, addMinutes, format } from "date-fns";
 import { StatusCodes } from "http-status-codes";
+import { IFilters, IJwtPayload } from "../../../types/common";
 import prisma from "../../config/prisma";
 import { AppError } from "../../utils/appError";
 import { calculatePagination } from "../../utils/calculatePagination";
-import { IOptions } from "../user/user.interface";
-import { IFilters, IJwtPayload, ISchedulePayload } from "./schedule.interface";
-import { scheduleRoutes } from "./schedule.routes";
+import { IOptions, Role } from "../user/user.interface";
+import { ISchedulePayload } from "./schedule.interface";
 
 const createSchedule = async (payload: ISchedulePayload) => {
   const { startDate, endDate, startTime, endTime } = payload;
@@ -97,12 +97,29 @@ const getSchedules = async (
     });
   }
 
-  const whereConditions: Prisma.ScheduleWhereInput =
-    andConditions.length > 0
-      ? {
-          AND: andConditions,
-        }
-      : {};
+  const doctorSchedules = await prisma.doctorSchedules.findMany({
+    where: {
+      doctor: {
+        email: user.email,
+      },
+    },
+    select: {
+      scheduleId: true,
+    },
+  });
+
+  const doctorSchedulesIds = doctorSchedules.map(
+    (schedule) => schedule.scheduleId
+  );
+
+  const whereConditions: Prisma.ScheduleWhereInput = {
+    ...(andConditions.length > 0 && { AND: andConditions }),
+    ...(user.role === Role.DOCTOR && {
+      id: {
+        notIn: doctorSchedulesIds,
+      },
+    }),
+  };
 
   const result = await prisma.schedule.findMany({
     where: whereConditions,

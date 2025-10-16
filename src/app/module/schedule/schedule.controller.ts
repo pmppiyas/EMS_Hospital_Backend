@@ -1,13 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import { JwtPayload } from "jsonwebtoken";
+import { IJwtPayload } from "../../../types/common";
 import catchAsync from "../../utils/catchAsync";
 import pick from "../../utils/queryPick";
-import {
-  default as sendResponse,
-  default as sendResponse,
-} from "../../utils/sendResponse";
-import { IFilters, IJwtPayload } from "./schedule.interface";
+import sendResponse from "../../utils/sendResponse";
 import { ScheduleServices } from "./schedule.services";
 
 const createSchedule = catchAsync(
