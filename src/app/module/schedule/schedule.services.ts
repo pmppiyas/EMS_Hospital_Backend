@@ -1,6 +1,13 @@
+import { Prisma } from "@prisma/client";
 import { addHours, addMinutes, format } from "date-fns";
+import { StatusCodes } from "http-status-codes";
 import prisma from "../../config/prisma";
-import { ISchedulePayload } from "./schedule.interface";
+import { AppError } from "../../utils/appError";
+import { calculatePagination } from "../../utils/calculatePagination";
+import { IOptions } from "../user/user.interface";
+import { IFilters, IJwtPayload, ISchedulePayload } from "./schedule.interface";
+import { scheduleRoutes } from "./schedule.routes";
+
 const createSchedule = async (payload: ISchedulePayload) => {
   const { startDate, endDate, startTime, endTime } = payload;
 
@@ -63,6 +70,81 @@ const createSchedule = async (payload: ISchedulePayload) => {
   return schedules;
 };
 
+const getSchedules = async (
+  user: IJwtPayload,
+  filters: Partial<IFilters>,
+  options: IOptions
+) => {
+  const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
+  const { startDateTime, endDateTime } = filters;
+
+  const andConditions: Prisma.ScheduleWhereInput[] = [];
+
+  if (startDateTime && endDateTime) {
+    andConditions.push({
+      AND: [
+        {
+          startDateTime: {
+            gte: startDateTime,
+          },
+        },
+        {
+          endDateTime: {
+            lte: endDateTime,
+          },
+        },
+      ],
+    });
+  }
+
+  const whereConditions: Prisma.ScheduleWhereInput =
+    andConditions.length > 0
+      ? {
+          AND: andConditions,
+        }
+      : {};
+
+  const result = await prisma.schedule.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+  });
+
+  const total = await prisma.schedule.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const deleteSchedule = async (id: string) => {
+  const exist = await prisma.schedule.findFirst({
+    where: { id },
+  });
+
+  if (!exist) {
+    throw new AppError(StatusCodes.NOT_FOUND, "This schedule is not exist");
+  }
+  await prisma.schedule.delete({
+    where: {
+      id,
+    },
+  });
+  return;
+};
+
 export const ScheduleServices = {
   createSchedule,
+  getSchedules,
+  deleteSchedule,
 };
