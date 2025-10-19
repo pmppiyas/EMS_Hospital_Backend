@@ -18,7 +18,7 @@ export const globalErrorHandler = (
   let message = err.message || "Something went wrong";
 
   //Duplicate
-  if (err.code === 11000) {
+  if (err.code === 11000 || err.expected) {
     const dupFunc = handleDuplicateError(err);
     statusCode = dupFunc.statusCode;
     message = dupFunc.message;
@@ -33,7 +33,7 @@ export const globalErrorHandler = (
   //Zod Error
   if (err.name === "ZodError") {
     message = handleZodValidatonError(err).message;
-    statusCode = httpStatus.NOT_ACCEPTABLE;
+    statusCode = handleZodValidatonError(err).statusCode;
   } else if (err instanceof AppError) {
     statusCode = err.statusCode;
     message = err.message;

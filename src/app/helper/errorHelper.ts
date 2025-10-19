@@ -37,10 +37,15 @@ export const handleDuplicateError = (error: any) => {
 };
 
 // 📦 Zod Validation Error Handler
-export const handleZodValidatonError = (error: any) => {
+export const handleZodValidatonError = (error: ZodError) => {
   resetState();
 
-  const errors = Object.values(error.errors);
+  const errors = error.issues ?? [];
+
+  const errorSources: { path: string; message: string }[] = [];
+  const missing: string[] = [];
+  const errMode: any[] = [];
+
   errors.forEach((errObj: any) => {
     const path = Array.isArray(errObj.path) ? errObj.path[0] : errObj.path;
 
@@ -57,7 +62,7 @@ export const handleZodValidatonError = (error: any) => {
   });
 
   const capitalizedFields = missing
-    .map((item: string) =>
+    .map((item) =>
       item ? item.charAt(0).toUpperCase() + item.slice(1) : "Field"
     )
     .join(", ");
@@ -70,6 +75,7 @@ export const handleZodValidatonError = (error: any) => {
   return {
     message: `${prefix}: ${capitalizedFields}`,
     statusCode: httpStatus.BAD_REQUEST,
+    errorSources,
   };
 };
 
