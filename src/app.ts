@@ -2,6 +2,7 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import router from "./app/routes/routes";
 
 const app = express();
@@ -24,12 +25,13 @@ app.get("/", (_req, res) => {
 
 app.use("/api/v1", router);
 
-// 404 Handler
 app.use((req, res, next) => {
   res.status(404).json({
     success: false,
     message: "Route Not Found",
   });
 });
+
+app.use(globalErrorHandler);
 
 export default app;
