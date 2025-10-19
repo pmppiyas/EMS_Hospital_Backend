@@ -16,6 +16,32 @@ const create = catchAsync(
   }
 );
 
+const getAll = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await SpecialityServices.gelAll();
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "All specialities retrieved successfull",
+      data: result,
+    });
+  }
+);
+
+const deleteSpeciality = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await SpecialityServices.deleteSpeciality(req.params.id);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "This specialities delete successfull",
+      data: result,
+    });
+  }
+);
+
 export const SpecialityController = {
   create,
+  getAll,
+  deleteSpeciality,
 };

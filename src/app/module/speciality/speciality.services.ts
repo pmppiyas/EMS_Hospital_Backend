@@ -35,6 +35,20 @@ const create = async (req: Request) => {
   });
 };
 
+const gelAll = async () => {
+  return await prisma.specialities.findMany({});
+};
+
+const deleteSpeciality = async (id: string) => {
+  await prisma.specialities.delete({
+    where: {
+      id: id,
+    },
+  });
+};
+
 export const SpecialityServices = {
   create,
+  gelAll,
+  deleteSpeciality,
 };
