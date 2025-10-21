@@ -17,4 +17,4 @@ router.get("/", SpecialityController.getAll);
 
 router.delete("/:id", SpecialityController.deleteSpeciality);
 
-export const SpecialityRoutes = router;
+export const specialityRoutes = router;

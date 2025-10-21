@@ -1,8 +1,10 @@
 import { Router } from "express";
 import { authRoutes } from "../module/auth/auth.routes";
+import { doctorRoutes } from "../module/doctor/doctor.routes";
 import { doctorScheduleRoutes } from "../module/doctorSchedule/doctor.routes";
+
 import { scheduleRoutes } from "../module/schedule/schedule.routes";
-import { SpecialityRoutes } from "../module/speciality/speciality.routes";
+import { specialityRoutes } from "../module/speciality/speciality.routes";
 import { userRoutes } from "../module/user/user.routes";
 
 const router = Router();
@@ -31,7 +33,11 @@ const allRoutes: routerArgs[] = [
   },
   {
     path: "/specialities",
-    route: SpecialityRoutes,
+    route: specialityRoutes,
+  },
+  {
+    path: "/doctor",
+    route: doctorRoutes,
   },
 ];
 
