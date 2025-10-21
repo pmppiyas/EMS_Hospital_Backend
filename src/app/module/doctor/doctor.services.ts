@@ -1,9 +1,11 @@
 import prisma from "../../config/prisma";
+import { AppError } from "../../utils/appError";
 import { calculatePagination } from "../../utils/calculatePagination";
-import { IOptions } from "../user/user.interface";
+import { createDoctorInput, IOptions } from "../user/user.interface";
 import { doctorSearchableFields } from "./doctor.constant";
 
-import { Gender } from "@prisma/client";
+import { Gender, Prisma } from "@prisma/client";
+import { StatusCodes } from "http-status-codes";
 
 const getAll = async (filters: any, options: IOptions) => {
   const { page, limit, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -11,7 +13,6 @@ const getAll = async (filters: any, options: IOptions) => {
 
   const andConditions: any[] = [];
 
-  // 🔍 Search term handling
   if (searchTerm) {
     andConditions.push({
       OR: doctorSearchableFields.map((field) => ({
@@ -79,6 +80,76 @@ const getAll = async (filters: any, options: IOptions) => {
   };
 };
 
+const update = async (id: string, payload: Prisma.DoctorUpdateInput) => {
+  const { specialities, ...doctorData } = payload as any;
+
+  const doctor = await prisma.doctor.findFirst({
+    where: { id },
+  });
+
+  if (!doctor) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Doctor not found");
+  }
+
+  if (specialities && Array.isArray(specialities) && specialities.length > 0) {
+    const deleteSpecialities = specialities.filter(
+      (spec) => spec.isDeleted === true
+    );
+    const addSpecialities = specialities.filter(
+      (spec) => spec?.isDeleted === false
+    );
+
+    if (deleteSpecialities.length > 0) {
+      for (const spec of deleteSpecialities) {
+        await prisma.doctorSpecialites.deleteMany({
+          where: {
+            doctorId: id,
+            specialitiesId: spec.specId,
+          },
+        });
+      }
+    }
+
+    for (const spec of addSpecialities) {
+      const exists = await prisma.doctorSpecialites.findFirst({
+        where: {
+          doctorId: id,
+          specialitiesId: spec.specialitiesId,
+        },
+      });
+
+      if (!exists) {
+        await prisma.doctorSpecialites.create({
+          data: {
+            doctorId: id,
+            specialitiesId: spec.specialitiesId,
+          },
+        });
+      }
+    }
+  }
+
+  const updateDoctor = await prisma.doctor.update({
+    where: { id },
+    data: doctorData,
+    include: {
+      doctorSchedules: {
+        include: {
+          schedule: true,
+        },
+      },
+      doctorSpecialities: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
+
+  return updateDoctor;
+};
+
 export const DoctorServices = {
   getAll,
+  update,
 };
