@@ -234,8 +234,36 @@ If none are relevant, return [].
   return result;
 };
 
+const getById = async (id: string) => {
+  const doctor = await prisma.doctor.findFirst({
+    where: {
+      id,
+      isDeleted: false,
+    },
+    include: {
+      doctorSpecialities: {
+        include: {
+          specialities: true,
+        },
+      },
+      doctorSchedules: {
+        include: {
+          schedule: true,
+        },
+      },
+    },
+  });
+
+  if (!doctor) {
+    throw new AppError(StatusCodes.NOT_FOUND, "Doctor not found");
+  }
+
+  return doctor;
+};
+
 export const DoctorServices = {
   getAll,
   update,
   suggestion,
+  getById,
 };

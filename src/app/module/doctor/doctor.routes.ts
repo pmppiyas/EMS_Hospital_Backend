@@ -9,4 +9,7 @@ router.patch("/:id", DoctorController.update);
 
 // suggestion route
 router.post("/suggestion", DoctorController.suggestion);
+
+router.get("/:id", DoctorController.getById);
+
 export const doctorRoutes = router;

@@ -46,8 +46,23 @@ const suggestion = catchAsync(
     });
   }
 );
+
+const getById = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await DoctorServices.getById(req.params.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Single doctor retrieved successfull",
+      data: result,
+    });
+  }
+);
+
 export const DoctorController = {
   getAll,
   update,
   suggestion,
+  getById,
 };
