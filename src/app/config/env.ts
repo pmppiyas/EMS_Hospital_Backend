@@ -14,4 +14,5 @@ export const ENV = {
     API_KEY: process.env.API_KEY,
     API_SECRET: process.env.API_SECRET,
   },
+  OPEN_AI_API_KEY: process.env.OPEN_AI_API_KEY,
 };

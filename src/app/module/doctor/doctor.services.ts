@@ -1,4 +1,6 @@
+import { OpenAI } from "../../config/openAi";
 import prisma from "../../config/prisma";
+import { extractJsonFromMessage } from "../../helper/extractJsonFromMessage";
 import { AppError } from "../../utils/appError";
 import { calculatePagination } from "../../utils/calculatePagination";
 import { IOptions } from "../user/user.interface";
@@ -170,7 +172,69 @@ const update = async (id: string, payload: Prisma.DoctorUpdateInput) => {
   });
 };
 
+const suggestion = async (payload?: { symptoms?: string }) => {
+  if (!payload || !payload.symptoms) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Symptoms are required");
+  }
+
+  const doctors = await prisma.doctor.findMany({
+    where: {
+      isDeleted: false,
+    },
+    include: {
+      doctorSpecialities: {
+        include: {
+          specialities: true,
+        },
+      },
+    },
+  });
+
+  const prompt = `
+You are an AI medical assistant.
+
+Analyze the patient's symptoms and select **only** the doctors whose specialties are *directly relevant* to those symptoms.
+
+🧠 Strict rules:
+1. You must only include doctors whose listed specialties clearly match or treat the given symptoms.
+2. If a doctor has **no specialties listed**, exclude them.
+3. If none of the doctors are relevant, return an **empty JSON array**.
+4. Prefer doctors with more years of experience if multiple are relevant.
+5. Do **not** include general or internal medicine doctors unless the symptom specifically fits their field.
+6. Your output must be **pure JSON** — no explanations, text, or comments.
+
+Patient Symptoms:
+${payload.symptoms}
+
+Doctor List (JSON):
+${JSON.stringify(doctors, null, 2)}
+
+🎯 Output format:
+Return a JSON array containing the full doctor objects (exactly as they appear in the input) for the top 1–3 most relevant doctors.
+If only one relevant doctor is found, return just that one.
+If none are relevant, return [].
+`;
+
+  const completion = await OpenAI.chat.completions.create({
+    model: "z-ai/glm-4.5-air:free",
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a helpful AI medical assistant that provides doctor suggestions.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
+  });
+  const result = await extractJsonFromMessage(completion.choices[0].message);
+  return result;
+};
+
 export const DoctorServices = {
   getAll,
   update,
+  suggestion,
 };

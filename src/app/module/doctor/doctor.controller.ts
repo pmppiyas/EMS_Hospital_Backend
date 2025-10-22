@@ -34,7 +34,20 @@ const update = catchAsync(
   }
 );
 
+const suggestion = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await DoctorServices.suggestion(req.body);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "All doctor retrieved successfull",
+      data: result,
+    });
+  }
+);
 export const DoctorController = {
   getAll,
   update,
+  suggestion,
 };
