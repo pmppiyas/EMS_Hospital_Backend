@@ -230,6 +230,7 @@ If none are relevant, return [].
     ],
   });
   const result = await extractJsonFromMessage(completion.choices[0].message);
+
   return result;
 };
 

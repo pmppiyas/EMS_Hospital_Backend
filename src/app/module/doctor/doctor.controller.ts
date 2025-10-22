@@ -41,7 +41,7 @@ const suggestion = catchAsync(
     sendResponse(res, {
       success: true,
       statusCode: StatusCodes.OK,
-      message: "All doctor retrieved successfull",
+      message: "Ai suggested doctor retrieved successfull",
       data: result,
     });
   }
