@@ -3,9 +3,16 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import { PaymentController } from "./app/module/payment/payment.controller";
 import router from "./app/routes/routes";
 
 const app = express();
+
+app.post(
+  "/stripe/webhook",
+  express.raw({ type: "application/json" }),
+  PaymentController.stripeWebhookEvent
+);
 
 app.use(cors());
 app.use(compression());

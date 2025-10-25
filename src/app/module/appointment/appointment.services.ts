@@ -1,7 +1,9 @@
 import { StatusCodes } from "http-status-codes";
 import { v4 as uuidv4 } from "uuid";
 import { IJwtPayload } from "../../../types/common";
+import { ENV } from "../../config/env";
 import prisma from "../../config/prisma";
+import { stripe } from "../../config/stripe";
 import { AppError } from "../../utils/appError";
 
 const create = async (
@@ -63,7 +65,40 @@ const create = async (
       },
     });
 
-    return createAppointment;
+    const transactionId = uuidv4();
+
+    const payment = await tnx.payment.create({
+      data: {
+        appointmentId: createAppointment.id,
+        transactionId,
+        amount: doctor.appointmentFee,
+      },
+    });
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      mode: "payment",
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: "Appointment with Dr." + doctor.name,
+            },
+            unit_amount: Math.round((doctor.appointmentFee * 100) / 122.3),
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        appointmentId: createAppointment.id,
+        paymentId: payment.id,
+      },
+      success_url: ENV.STRIPE.SUCCESS_URL,
+      cancel_url: ENV.STRIPE.CANCEL_URL,
+    });
+
+    return { payemntUrl: session.url };
   });
 
   return result;

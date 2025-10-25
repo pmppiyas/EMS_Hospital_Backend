@@ -15,4 +15,10 @@ export const ENV = {
     API_SECRET: process.env.API_SECRET,
   },
   OPEN_AI_API_KEY: process.env.OPEN_AI_API_KEY,
+  STRIPE: {
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    SUCCESS_URL: process.env.SUCCESS_URL,
+    CANCEL_URL: process.env.CANCEL_URL,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+  },
 };
