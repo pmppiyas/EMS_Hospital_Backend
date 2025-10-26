@@ -7,4 +7,10 @@ const router = Router();
 
 router.post("/", checkAuth(Role.PATIENT), AppointmentController.create);
 
+router.get(
+  "/",
+  checkAuth(...Object.values(Role)),
+  AppointmentController.getAppointments
+);
+
 export const appointmentRoutes = router;
