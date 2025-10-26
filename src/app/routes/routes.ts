@@ -3,6 +3,7 @@ import { appointmentRoutes } from "../module/appointment/appointment.routes";
 import { authRoutes } from "../module/auth/auth.routes";
 import { doctorRoutes } from "../module/doctor/doctor.routes";
 import { doctorScheduleRoutes } from "../module/doctorSchedule/doctor.routes";
+import { prescriptionRoutes } from "../module/prescription/prescription.routes";
 import { scheduleRoutes } from "../module/schedule/schedule.routes";
 import { specialityRoutes } from "../module/speciality/speciality.routes";
 import { userRoutes } from "../module/user/user.routes";
@@ -42,6 +43,10 @@ const allRoutes: routerArgs[] = [
   {
     path: "/appointment",
     route: appointmentRoutes,
+  },
+  {
+    path: "/prescription",
+    route: prescriptionRoutes,
   },
 ];
 
