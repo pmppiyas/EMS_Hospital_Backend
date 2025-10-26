@@ -39,7 +39,23 @@ const getAppointments = catchAsync(
   }
 );
 
+const updateAppointment = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await AppointmentService.update(
+      req.params.id,
+      req.body.status,
+      req.user as IJwtPayload
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Appointment updated successfully",
+      data: result,
+    });
+  }
+);
 export const AppointmentController = {
   create,
   getAppointments,
+  updateAppointment,
 };

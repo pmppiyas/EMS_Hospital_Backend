@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { AppointmentStatus, Prisma } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { v4 as uuidv4 } from "uuid";
 import { IJwtPayload } from "../../../types/common";
@@ -175,7 +175,29 @@ const getAppointments = async (
   };
 };
 
+const update = async (
+  id: string,
+  status: AppointmentStatus,
+  user: IJwtPayload
+) => {
+  const appointment = await prisma.appointment.findUniqueOrThrow({
+    where: { id },
+    include: { doctor: true },
+  });
+
+  if (user.role === Role.DOCTOR) {
+    if (user.email !== appointment.doctor.email) {
+      throw new AppError(StatusCodes.FORBIDDEN, "This is not your appointment");
+    }
+  }
+  return await prisma.appointment.update({
+    where: { id },
+    data: { status },
+  });
+};
+
 export const AppointmentService = {
   create,
   getAppointments,
+  update,
 };
