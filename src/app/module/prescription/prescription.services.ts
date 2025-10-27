@@ -4,6 +4,7 @@ import { IJwtPayload } from "../../../types/common";
 import prisma from "../../config/prisma";
 import { AppError } from "../../utils/appError";
 import { Role } from "../user/user.interface";
+import { userDetails } from "./prescription.constant";
 
 const create = async (
   user: IJwtPayload,
@@ -60,4 +61,62 @@ const create = async (
   });
 };
 
-export const PrescriptionService = { create };
+const get = async (user: IJwtPayload) => {
+  const where =
+    user.role === Role.ADMIN
+      ? {}
+      : user.role === Role.DOCTOR
+      ? {
+          doctor: {
+            email: user.email,
+          },
+        }
+      : user.role === Role.PATIENT
+      ? {
+          patient: {
+            email: user.email,
+          },
+        }
+      : null;
+
+  const include =
+    user.role === Role.ADMIN
+      ? {
+          doctor: {
+            select: {
+              ...userDetails,
+            },
+          },
+          patient: {
+            select: {
+              ...userDetails,
+            },
+          },
+        }
+      : user.role === Role.DOCTOR
+      ? {
+          patient: {
+            select: {
+              ...userDetails,
+            },
+          },
+        }
+      : user.role === Role.PATIENT
+      ? {
+          doctor: {
+            select: {
+              ...userDetails,
+            },
+          },
+        }
+      : {};
+
+  if (!where) return [];
+
+  return await prisma.prescription.findMany({
+    where: { ...where },
+    include: { ...include },
+  });
+};
+
+export const PrescriptionService = { create, get };

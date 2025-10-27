@@ -11,4 +11,6 @@ router.post(
   PrescriptionController.create
 );
 
+router.get("/", checkAuth(...Object.keys(Role)), PrescriptionController.get);
+
 export const prescriptionRoutes = router;

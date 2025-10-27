@@ -22,6 +22,19 @@ const create = catchAsync(
   }
 );
 
+const get = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PrescriptionService.get(req.user as IJwtPayload);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Prescription retrieved successfull",
+      data: result,
+    });
+  }
+);
+
 export const PrescriptionController = {
   create,
+  get,
 };
