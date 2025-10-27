@@ -88,7 +88,11 @@ const get = async (user: IJwtPayload) => {
 
     select: {
       id: true,
-      patientId: true,
+      patient: {
+        select: {
+          name: true,
+        },
+      },
       comment: true,
       rating: true,
     },
