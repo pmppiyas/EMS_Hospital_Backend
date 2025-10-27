@@ -27,6 +27,7 @@ model Patient {
   user          User           @relation(fields: [email], references: [email])
   appointment   Appointment[]
   prescription  Prescription[]
+  Review        Review[]
 
   @@map("patients")
 }
@@ -42,6 +43,7 @@ model Doctor {
   experience          Int                 @default(0)
   gender              Gender
   appointmentFee      Int
+  rating              Int                 @default(0)
   qualification       String
   currentWorkingPlace String
   designation         String
@@ -53,6 +55,7 @@ model Doctor {
   doctorSpecialities  DoctorSpecialites[]
   appointment         Appointment[]
   prescription        Prescription[]
+  Review              Review[]
 
   @@map("doctors")
 }
