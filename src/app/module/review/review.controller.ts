@@ -22,6 +22,20 @@ const create = catchAsync(
   }
 );
 
+const get = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ReviewServices.get(req.user as IJwtPayload);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Your reviews retrived successfull",
+      data: result,
+    });
+  }
+);
+
 export const ReviewController = {
   create,
+  get,
 };

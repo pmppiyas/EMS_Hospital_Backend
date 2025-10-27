@@ -2,6 +2,7 @@ import { StatusCodes } from "http-status-codes";
 import { IJwtPayload } from "../../../types/common";
 import prisma from "../../config/prisma";
 import { AppError } from "../../utils/appError";
+import { Role } from "../user/user.interface";
 
 const create = async (
   user: IJwtPayload,
@@ -73,6 +74,32 @@ const create = async (
   });
 };
 
+const get = async (user: IJwtPayload) => {
+  const where =
+    user.role === Role.ADMIN
+      ? {}
+      : {
+          doctor: {
+            email: user.email,
+          },
+        };
+  const reviews = await prisma.review.findMany({
+    where,
+
+    select: {
+      id: true,
+      patientId: true,
+      comment: true,
+      rating: true,
+    },
+  });
+
+  return reviews
+    .sort((a, b) => (b.comment?.length ?? 0) - (a.comment?.length ?? 0))
+    .slice(0, 10);
+};
+
 export const ReviewServices = {
   create,
+  get,
 };
