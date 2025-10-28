@@ -14,7 +14,7 @@ const crdLogin = catchAsync(
       secure: true,
       httpOnly: true,
       sameSite: "none",
-      maxAge: 1000 * 60 * 60,
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
     res.cookie("refreshToken", refreshToken, {
@@ -35,6 +35,21 @@ const crdLogin = catchAsync(
   }
 );
 
+const getMe = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const userSession = req.cookies;
+
+    const result = await AuthServices.getMe(userSession);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Credientials login successfully",
+      data: result,
+    });
+  }
+);
+
 export const AuthController = {
   crdLogin,
+  getMe,
 };
