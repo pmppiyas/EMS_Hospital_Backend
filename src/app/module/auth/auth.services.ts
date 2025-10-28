@@ -1,5 +1,6 @@
 import * as bcrypt from "bcryptjs";
 import { StatusCodes } from "http-status-codes";
+import { ENV } from "../../config/env";
 import prisma from "../../config/prisma";
 import { jwtTokenGen } from "../../helper/jwtTokenGen";
 import { verifyToken } from "../../helper/verifyToken";
@@ -101,8 +102,50 @@ const refreshToken = async (token: string) => {
   };
 };
 
+const changePassword = async (user: any, payload: any) => {
+  const { new_password, old_password } = payload;
+
+  if (!new_password || !old_password) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "Both old and new passwords are required"
+    );
+  }
+
+  const userData = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      status: {
+        not: UserStatus.DELETED,
+      },
+    },
+  });
+
+  const isCorrectPass = await bcrypt.compare(old_password, userData.password);
+
+  if (!isCorrectPass) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "Old password is incorrect");
+  }
+
+  const saltRounds = Number(process.env.BCRYPT_SALTNUMBER);
+  const hashedPassword = await bcrypt.hash(new_password, saltRounds);
+
+  await prisma.user.update({
+    where: {
+      email: userData.email,
+    },
+    data: {
+      password: hashedPassword,
+      needPasswordChange: false,
+    },
+  });
+
+  return "Password change successfully";
+};
+
 export const AuthServices = {
   crdLogin,
   getMe,
   refreshToken,
+  changePassword,
 };
