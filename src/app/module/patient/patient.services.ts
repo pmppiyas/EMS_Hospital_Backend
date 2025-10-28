@@ -66,6 +66,20 @@ const get = async (filter: IPatientFilterRequest, options: IOptions) => {
   };
 };
 
+const getById = async (id: string) => {
+  return await prisma.patient.findUniqueOrThrow({
+    where: {
+      id,
+    },
+    include: {
+      appointment: true,
+      prescription: true,
+      PatientHealthData: true,
+      Review: true,
+    },
+  });
+};
 export const PatientServices = {
   get,
+  getById,
 };

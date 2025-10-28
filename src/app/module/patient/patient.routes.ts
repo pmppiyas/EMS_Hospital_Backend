@@ -5,5 +5,10 @@ import { PatientController } from "./patient.controller";
 const router = Router();
 
 router.get("/", checkAuth(Role.ADMIN), PatientController.get);
+router.get(
+  "/:id",
+  checkAuth(Role.ADMIN, Role.DOCTOR),
+  PatientController.getById
+);
 
 export const patientRoutes = router;
