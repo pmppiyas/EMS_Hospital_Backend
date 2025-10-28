@@ -143,9 +143,50 @@ const changePassword = async (user: any, payload: any) => {
   return "Password change successfully";
 };
 
+const resetPassword = async (session: any, payload: any) => {
+  const { new_password } = payload;
+
+  if (!new_password) {
+    throw new AppError(StatusCodes.BAD_REQUEST, "New password is required");
+  }
+
+  const decoded = verifyToken(session.accessToken);
+
+  if (!decoded || typeof decoded !== "object" || !decoded.email) {
+    throw new AppError(StatusCodes.FORBIDDEN, "Forbidden!");
+  }
+
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      email: decoded.email,
+      status: {
+        not: UserStatus.DELETED,
+      },
+    },
+  });
+
+  const saltRounds = Number(process.env.BCRYPT_SALTNUMBER);
+  const hashedPassword = await bcrypt.hash(new_password, saltRounds);
+
+  await prisma.user.update({
+    where: {
+      email: user.email,
+    },
+    data: {
+      password: hashedPassword,
+      needPasswordChange: false,
+    },
+  });
+
+  return {
+    message: "Password reset successfully!",
+  };
+};
+
 export const AuthServices = {
   crdLogin,
   getMe,
   refreshToken,
   changePassword,
+  resetPassword,
 };
