@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
+import { IJwtPayload } from "../../../types/common";
 import catchAsync from "../../utils/catchAsync";
 import pick from "../../utils/queryPick";
 import sendResponse from "../../utils/sendResponse";
@@ -35,7 +36,38 @@ const getById = catchAsync(
   }
 );
 
+const softDelete = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PatientServices.softDelete(req.params.id);
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Pateint delete successfull",
+      data: result,
+    });
+  }
+);
+
+const update = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await PatientServices.update(
+      req.user as IJwtPayload,
+      req.body
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Pateint updated successfull",
+      data: result,
+    });
+  }
+);
+
 export const PatientController = {
   get,
   getById,
+  softDelete,
+  update,
 };

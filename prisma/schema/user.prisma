@@ -29,6 +29,7 @@ model Patient {
   prescription      Prescription[]
   Review            Review[]
   PatientHealthData PatientHealthData?
+  medicalReport     MedicalReport[]
 
   @@map("patients")
 }

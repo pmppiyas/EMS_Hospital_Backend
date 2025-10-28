@@ -11,4 +11,6 @@ router.get(
   PatientController.getById
 );
 
+router.delete("/soft/:id", PatientController.softDelete);
+router.patch("/", checkAuth(Role.PATIENT), PatientController.update);
 export const patientRoutes = router;

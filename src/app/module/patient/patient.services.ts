@@ -1,7 +1,8 @@
 import { Prisma } from "@prisma/client";
+import { IJwtPayload } from "../../../types/common";
 import prisma from "../../config/prisma";
 import { calculatePagination } from "../../utils/calculatePagination";
-import { IOptions } from "../user/user.interface";
+import { IOptions, UserStatus } from "../user/user.interface";
 import { patientSearchableFields } from "./patient.constant";
 import { IPatientFilterRequest } from "./patient.interface";
 
@@ -67,7 +68,7 @@ const get = async (filter: IPatientFilterRequest, options: IOptions) => {
 };
 
 const getById = async (id: string) => {
-  return await prisma.patient.findUniqueOrThrow({
+  const data = await prisma.patient.findUniqueOrThrow({
     where: {
       id,
     },
@@ -78,8 +79,72 @@ const getById = async (id: string) => {
       Review: true,
     },
   });
+
+  return data;
 };
+
+const softDelete = async (id: string) => {
+  return await prisma.$transaction(async (tnx) => {
+    const deletePatient = await tnx.patient.update({
+      where: {
+        id,
+      },
+      data: {
+        isDeleted: true,
+      },
+    });
+
+    await tnx.user.update({
+      where: {
+        email: deletePatient.email,
+      },
+
+      data: {
+        status: UserStatus.DELETED,
+      },
+    });
+    return deletePatient;
+  });
+};
+
+const update = async (user: IJwtPayload, payload: any) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      email: user.email,
+      isDeleted: false,
+    },
+  });
+
+  const { medicalReport, patientHelthData } = payload;
+
+  return await prisma.$transaction(async (tnx) => {
+    if (patientHelthData) {
+      await tnx.patientHealthData.upsert({
+        where: {
+          patientId: patientData.id,
+        },
+        update: patientHelthData,
+        create: {
+          patientId: patientData.id,
+          ...patientHelthData,
+        },
+      });
+    }
+
+    if (medicalReport) {
+      await tnx.medicalReport.create({
+        data: {
+          ...medicalReport,
+          patientId: patientData.id,
+        },
+      });
+    }
+  });
+};
+
 export const PatientServices = {
   get,
   getById,
+  softDelete,
+  update,
 };
