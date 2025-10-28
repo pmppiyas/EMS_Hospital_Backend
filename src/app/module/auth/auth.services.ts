@@ -5,7 +5,6 @@ import { jwtTokenGen } from "../../helper/jwtTokenGen";
 import { verifyToken } from "../../helper/verifyToken";
 import { AppError } from "../../utils/appError";
 import { UserStatus } from "../user/user.interface";
-import { UserRole } from "./../../../../node_modules/.pnpm/@prisma+client@6.17.0_prism_9cd274e8275800995647dd1d52e36ba9/node_modules/.prisma/client/index.d";
 import { ILoginPayload } from "./auth.interface";
 
 const crdLogin = async (payload: ILoginPayload) => {
@@ -71,7 +70,39 @@ const getMe = async (session: any) => {
   return user;
 };
 
+const refreshToken = async (token: string) => {
+  let decodedData;
+
+  try {
+    decodedData = verifyToken(token);
+  } catch (err) {
+    throw new AppError(StatusCodes.FORBIDDEN, "You are not authorized");
+  }
+
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      email: decodedData.email,
+      status: {
+        not: UserStatus.DELETED,
+      },
+    },
+  });
+
+  const tokenGen = jwtTokenGen({
+    email: user.email,
+    role: user.role,
+  });
+
+  console.log((await tokenGen).accessToken);
+
+  return {
+    accessToken: (await tokenGen).accessToken,
+    needPasswordChange: user.needPasswordChange,
+  };
+};
+
 export const AuthServices = {
   crdLogin,
   getMe,
+  refreshToken,
 };

@@ -7,7 +7,7 @@ export const jwtTokenGen = async (payload: { email: string; role: string }) => {
     ENV.JWT_SECRET,
     {
       algorithm: "HS256",
-      expiresIn: "1h",
+      expiresIn: "5h",
     }
   ) as SignOptions;
 
