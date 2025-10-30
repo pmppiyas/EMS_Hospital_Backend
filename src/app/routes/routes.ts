@@ -3,6 +3,7 @@ import { appointmentRoutes } from "../module/appointment/appointment.routes";
 import { authRoutes } from "../module/auth/auth.routes";
 import { doctorRoutes } from "../module/doctor/doctor.routes";
 import { doctorScheduleRoutes } from "../module/doctorSchedule/doctor.routes";
+import { metaRoutes } from "../module/meta/meta.routes";
 import { patientRoutes } from "../module/patient/patient.routes";
 import { prescriptionRoutes } from "../module/prescription/prescription.routes";
 import { reviewRoutes } from "../module/review/review.routes";
@@ -57,6 +58,11 @@ const allRoutes: routerArgs[] = [
   {
     path: "/review",
     route: reviewRoutes,
+  },
+
+  {
+    path: "/meta",
+    route: metaRoutes,
   },
 ];
 
