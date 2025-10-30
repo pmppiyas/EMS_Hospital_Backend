@@ -14,6 +14,7 @@ import {
   createPatientInput,
   IOptions,
   Role,
+  UserStatus,
 } from "./user.interface";
 
 const getAllUser = async (params: any, options: IOptions) => {
@@ -125,7 +126,7 @@ const createAdmin = async (req: Request) => {
   });
 
   if (isExist) {
-    throw new AppError(StatusCodes.CONFLICT, "Patient data already exist");
+    throw new AppError(StatusCodes.CONFLICT, "This admin is already exist");
   }
 
   if (file) {
@@ -195,9 +196,38 @@ const createDoctor = async (req: Request) => {
   return result;
 };
 
+const changeUserStatus = async (id: string, status: UserStatus) => {
+  const user = await prisma.user.findUniqueOrThrow({
+    where: {
+      id,
+    },
+  });
+  if (user.status === status) {
+    throw new AppError(
+      StatusCodes.CONFLICT,
+      `User's status is already ${status}`
+    );
+  }
+
+  if (user.status === UserStatus.DELETED) {
+    throw new AppError(StatusCodes.NOT_ACCEPTABLE, "User is already deleted");
+  }
+
+  const updatedStatus = await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      status,
+    },
+  });
+
+  return updatedStatus;
+};
 export const UserServices = {
   getAllUser,
   create_patient,
   createAdmin,
   createDoctor,
+  changeUserStatus,
 };

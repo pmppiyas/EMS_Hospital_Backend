@@ -86,6 +86,18 @@ const changePassword = catchAsync(
   }
 );
 
+const forgetPassword = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await AuthServices.forgetPassword(req.body);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: "Password forget request received successfully",
+      data: result,
+    });
+  }
+);
+
 const resetPassword = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const result = await AuthServices.resetPassword(req.cookies, req.body);
@@ -97,10 +109,12 @@ const resetPassword = catchAsync(
     });
   }
 );
+
 export const AuthController = {
   crdLogin,
   getMe,
   refreshToken,
   changePassword,
   resetPassword,
+  forgetPassword,
 };

@@ -1,4 +1,4 @@
-import { AppointmentStatus, Prisma } from "@prisma/client";
+import { AppointmentStatus, PaymentStatus, Prisma } from "@prisma/client";
 import { StatusCodes } from "http-status-codes";
 import { v4 as uuidv4 } from "uuid";
 import { IJwtPayload } from "../../../types/common";
@@ -196,8 +196,59 @@ const update = async (
   });
 };
 
+const cancelUnpaidAppointment = async () => {
+  const thirtyMinAgo = new Date(Date.now() - 30 * 60 * 1000);
+
+  const upPaidAppointments = await prisma.appointment.findMany({
+    where: {
+      createdAt: {
+        lte: thirtyMinAgo,
+      },
+
+      paymentStatus: PaymentStatus.UNPAID,
+    },
+  });
+
+  const appointmentIdsForCancel = upPaidAppointments.map(
+    (appointment) => appointment.id
+  );
+
+  await prisma.$transaction(async (tnx) => {
+    await tnx.payment.deleteMany({
+      where: {
+        appointmentId: {
+          in: appointmentIdsForCancel,
+        },
+      },
+    });
+
+    await tnx.appointment.deleteMany({
+      where: {
+        id: {
+          in: appointmentIdsForCancel,
+        },
+      },
+    });
+
+    for (const unPaidAppointment of upPaidAppointments) {
+      await tnx.doctorSchedules.update({
+        where: {
+          doctorId_scheduleId: {
+            doctorId: unPaidAppointment.doctorId,
+            scheduleId: unPaidAppointment.scheduleId,
+          },
+        },
+        data: {
+          isBooked: false,
+        },
+      });
+    }
+  });
+};
+
 export const AppointmentService = {
   create,
   getAppointments,
   update,
+  cancelUnpaidAppointment,
 };

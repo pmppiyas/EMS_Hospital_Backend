@@ -2,7 +2,9 @@ import compression from "compression";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
+import cron from "node-cron";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
+import { AppointmentService } from "./app/module/appointment/appointment.services";
 import { PaymentController } from "./app/module/payment/payment.controller";
 import router from "./app/routes/routes";
 
@@ -25,6 +27,14 @@ app.use(
     credentials: true,
   })
 );
+
+cron.schedule("* * * * *", () => {
+  try {
+    AppointmentService.cancelUnpaidAppointment();
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 app.get("/", (_req, res) => {
   res.send("API is running");

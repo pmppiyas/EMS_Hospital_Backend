@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import pick from "../../utils/queryPick";
 import sendResponse from "../../utils/sendResponse";
 import { userFilterableFields, userQueryFields } from "./user.constant";
+import { UserStatus } from "./user.interface";
 import { UserServices } from "./user.services";
 
 const getAllUser = catchAsync(
@@ -61,9 +62,26 @@ const createDoctor = catchAsync(
   }
 );
 
+const changeUserStatus = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await UserServices.changeUserStatus(
+      req.params.id,
+      req.params.status.toUpperCase() as UserStatus
+    );
+
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: `User ${req.params.status} successfully`,
+      data: result,
+    });
+  }
+);
+
 export const UserController = {
   getAllUser,
   create_patient,
   createAdmin,
   createDoctor,
+  changeUserStatus,
 };

@@ -8,6 +8,7 @@ import {
   createAdminValidation,
   createDoctorValidation,
   createPatientValidation,
+  userStatusChangeValidation,
 } from "./user.validation";
 
 const router = Router();
@@ -33,6 +34,12 @@ router.post(
   fileUploader.upload.single("file"),
   validateRequest(createDoctorValidation),
   UserController.createDoctor
+);
+
+router.patch(
+  "/:id/:status",
+  validateRequest(userStatusChangeValidation),
+  UserController.changeUserStatus
 );
 
 export const userRoutes = router;

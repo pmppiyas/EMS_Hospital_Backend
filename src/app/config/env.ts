@@ -21,4 +21,11 @@ export const ENV = {
     CANCEL_URL: process.env.CANCEL_URL,
     STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
   },
+
+  REDIS: {
+    DB_NAME: process.env.REDIS_DB_NAME,
+    DB_PASS: process.env.REDIS_DB_PASS,
+    DB_HOST: process.env.REDIS_HOST,
+    DB_PORT: process.env.REDIS_PORT,
+  },
 };

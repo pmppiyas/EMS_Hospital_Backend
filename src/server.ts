@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import http, { Server } from "http";
 import app from "./app";
+import { connectRedis } from "./app/config/redis";
 
 dotenv.config();
 
@@ -8,6 +9,7 @@ let server: Server | null = null;
 
 async function startServer() {
   try {
+    connectRedis();
     server = http.createServer(app);
     server.listen(process.env.PORT, () => {
       console.log(`🚀 Server is running on port ${process.env.PORT}`);
