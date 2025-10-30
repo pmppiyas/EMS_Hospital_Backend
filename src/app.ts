@@ -7,6 +7,7 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { AppointmentService } from "./app/module/appointment/appointment.services";
 import { PaymentController } from "./app/module/payment/payment.controller";
 import router from "./app/routes/routes";
+import { deleteAllFilesInUploads } from "./app/utils/deleteFile";
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(
 cron.schedule("* * * * *", () => {
   try {
     AppointmentService.cancelUnpaidAppointment();
+    deleteAllFilesInUploads();
   } catch (err) {
     console.log(err);
   }
