@@ -1,95 +1,80 @@
-# Next Blog Starter
+# EMS Hospital Backend
 
-A **EMS - For Hospital** built with **TypeScript, Express.js, Prisma**.  
-This project is designed for the **Next Level Web Development Bootcamp** to help
-learners practice Prisma hands-on by building a blog platform.
+A **Hospital EMS (Electronic Management System)** backend built with
+**TypeScript, Express.js, and Prisma**.  
+This project is designed to manage patients, doctors, appointments, payments,
+and health records efficiently.
+
+[![Node.js](https://img.shields.io/badge/Node.js-18.x-green?logo=node.js)](https://nodejs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Express.js](https://img.shields.io/badge/Express-5.1.0-lightgrey?logo=express)](https://expressjs.com/)
+[![Prisma ORM](https://img.shields.io/badge/Prisma-6.17.0-2D3748?logo=prisma)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?logo=postgresql)](https://www.postgresql.org/)
+[![JWT](https://img.shields.io/badge/JWT-Auth-black?logo=jsonwebtokens)](https://jwt.io/)
+[![Zod](https://img.shields.io/badge/Zod-Validation-orange)](https://zod.dev/)
+[![Cloudinary](https://img.shields.io/badge/Cloudinary-Image%20Upload-3448C5?logo=cloudinary)](https://cloudinary.com/)
+[![pnpm](https://img.shields.io/badge/pnpm-Fast%20Package%20Manager-yellow?logo=pnpm)](https://pnpm.io/)
+[![ESLint](https://img.shields.io/badge/Code%20Style-ESLint-4B32C3?logo=eslint)](https://eslint.org/)
 
 ---
 
 ## Features
 
-- TypeScript + Express.js setup
-- Modular project structure
-- Environment configuration with `dotenv`
-- Ready to extend with blog modules (Posts, Users, etc.)
+- Fully typed backend using **TypeScript**
+- Modular structure for **patients, doctors, appointments, and payments**
+- **Prisma ORM** for database modeling & management
+- Authentication with **JWT**
+- File uploads with **Cloudinary** support
+- Data validation using **Zod**
+- RESTful API structure
+- Environment management via `.env`
+- Global error handler for handle error
 
 ---
 
-## Installation
+## Tech Stack
 
-Install dependencies:
+- **Node.js** - Server runtime
+- **Express.js** - API framework
+- **TypeScript** - Strong typing
+- **Prisma** - ORM for database queries
+- **PostgreSQL/MySQL** - Database (configurable)
+- **Cloudinary** - File & image storage
+- **Zod** - Request validation
+- **JWT** - Authentication
+
+---
+
+## Getting Started
+
+### Install Dependencies
 
 ```bash
-# using npm
+# Using npm
 npm install
 
-# using yarn
+# Using yarn
 yarn install
 
-# using pnpm
+# Using pnpm
 pnpm install
 ```
 
-Setup environment variables:
+### Folder Structure
 
 ```bash
-cp .env.example .env
-```
-
-Run the development server:
-
-```bash
-# using npm
-npm run dev
-
-# using yarn
-yarn dev
-
-# using pnpm
-pnpm dev
-```
-
----
-
-## Folder Structure
-
-```
-EMS Hospital/
-│── node_modules/          # Dependencies
+hospital_ems_backend/
+│── node_modules/            # Dependencies
+│── prisma/                  # Prisma schema & migrations
 │── src/
-│   ├── app.ts             # Express app configuration
-│   ├── server.ts          # Server entry point
-│   ├── config/            # Environment & configuration files
-│   └── modules/           # Application modules (posts, users, etc.)
-│── package.json           # Project metadata & scripts
-│── pnpm-lock.yaml         # Lockfile (pnpm)
-│── tsconfig.json          # TypeScript configuration
-│── README.md              # Documentation
+│   ├── server.ts            # Server entry point
+│   ├── app.ts               # Express app configuration
+│   ├── config/              # Environment & config files
+│   ├── modules/             # Feature-based modules (patients, doctors, etc.)
+│   └── middleware/          # Validation, auth, error handlers
+│── package.json             # Project metadata & scripts
+│── tsconfig.json            # TypeScript configuration
+│── .env.example             # Example environment variables
+│── README.md                # Project documentation
+
 ```
-
----
-
-## Scripts
-
-```bash
-# Run in development mode
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Run production build
-pnpm start
-```
-
----
-
-## Learning Objective
-
-This starter pack is part of the **Next Level Web Development Bootcamp**
-curriculum. By using this project, students will learn how to:
-
-- Connect a Node.js app with Prisma ORM
-- Build modular APIs
-- Manage environment variables
-- Structure scalable backend projects
